@@ -10,57 +10,90 @@ public class CharacterController : MonoBehaviour,ISaveable,IModifierProvider
 {
     public BaseStats baseStats;
     
-    [SerializeField] private Transform rightHandTransform; 
-    [SerializeField] private Weapon defaultWeapon = null;
+    public Animator anim;
     
-    private Weapon currentWeapon;
+    private static readonly int Attack1 = Animator.StringToHash("Attack");
+
+    private float nextFire = 0.0f;
+
+    public GameObject rayProjectile;
+    public Transform firePosition;
+    public Transform firePoint;
+
+    private bool isAttacking;
+
+    public Rigidbody2D rb;
     void Start()
     {
-        EquipWeapon(defaultWeapon);
     }
 
     // Update is called once per frame
     void Update()
     {
         Attack();
+        FireTransformPosition();
     }
 
     void Attack()
     {
-        if (Input.GetButtonDown("Fire1"))
+        if (Input.GetButtonDown("Fire1") && !isAttacking)
         {
-            Attack(true);
+            isAttacking = true;
+            AttackMelee(true);
         }
 
         if (Input.GetButtonUp("Fire1"))
         {
-            Attack(false);
+            isAttacking = false;
+            AttackMelee(false);
+            anim.speed = 1;
+        }
+
+        if (Input.GetButtonDown("Fire1") && !isAttacking)
+        {
+            isAttacking = true;
+        }
+        
+        if (Input.GetButton("Fire2"))
+        {
+            Fire();
+        }
+        
+        if (Input.GetButtonUp("Fire2"))
+        {
+            isAttacking = false;
+        }  
+    }
+    
+    void AttackMelee(bool state)
+    {
+        anim.speed = baseStats.GetStat(Stat.AttackSpeed);
+        anim.SetBool(Attack1,state);
+    }
+    
+    void Fire()
+    {
+        if (Time.time  > nextFire)
+        {
+            nextFire = Time.time + baseStats.GetStat(Stat.AttackSpeed);
+            GameObject go = Instantiate(rayProjectile, firePoint.transform.position, firePoint.rotation);
+            go.transform.parent = this.gameObject.transform;
+            Projectile bullet = go.GetComponent<Projectile>();
+            if (bullet == null) return;
+            bullet.GetComponent<Rigidbody2D>().AddForce(firePoint.right * bullet.speed);
         }
     }
     
-    public bool hasWeapon()
+    void FireTransformPosition()
     {
-        return currentWeapon != null;
-    }
-    
-    public void EquipWeapon(Weapon weapon)
-    {
-        if(weapon == null || hasWeapon()) return;
-        
-        if (currentWeapon == null)
-            currentWeapon = weapon;
-
-        weapon.Spawn(rightHandTransform);
-    }
-    
-    void Attack(bool state)
-    {
-        if(!hasWeapon()) return;
-        WeaponSocket weaponSocket = rightHandTransform.GetComponent<WeaponSocket>();
-
-        if (weaponSocket == null || weaponSocket.weapon == null || weaponSocket.isPlayingAnimation("Attack")) return;
-        weaponSocket.collider2D.enabled = state;
-        weaponSocket.PlayAttackAnim(state);
+        if(rb.velocity.x > 0 && rb.velocity.y == 0)
+            firePosition.rotation = Quaternion.Euler(0,0,0);
+        else if(rb.velocity.y > 0)
+            firePosition.rotation = Quaternion.Euler(0,0,90);
+        else if(rb.velocity.x < 0 &&  rb.velocity.y == 0)
+            firePosition.rotation = Quaternion.Euler(0,0,180);
+        else if(rb.velocity.y < 0)
+            firePosition.rotation = Quaternion.Euler(0,0,-90);
     }
     
     public IEnumerator<float> GetAdditiveModifier(Stat stat)
