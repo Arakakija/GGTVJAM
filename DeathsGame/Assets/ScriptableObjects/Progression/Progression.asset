@@ -16,7 +16,12 @@ MonoBehaviour:
   - characterClass: 0
     _stats:
     - stat: 0
-      levels: []
+      levels:
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
     - stat: 1
       levels: []
     - stat: 4
@@ -42,3 +47,51 @@ MonoBehaviour:
       - 60
       - 120
       - 240
+    - stat: 5
+      levels:
+      - 1000
+      - 4
+      - 5
+      - 5
+      - 5
+  - characterClass: 1
+    _stats:
+    - stat: 0
+      levels:
+      - 2
+      - 3
+      - 4
+      - 5
+      - 6
+    - stat: 1
+      levels: []
+    - stat: 4
+      levels: []
+    - stat: 3
+      levels:
+      - 1
+      - 2
+      - 2.25
+      - 2.5
+      - 2.75
+    - stat: 2
+      levels:
+      - 1
+      - 1.5
+      - 2
+      - 2.5
+      - 3
+    - stat: 7
+      levels:
+      - 15
+      - 30
+      - 60
+      - 120
+      - 240
+    - stat: 5
+      levels:
+      - 10
+      - 4
+      - 5
+      - 5
+      - 5

@@ -10,25 +10,24 @@ public class Patrol : MonoBehaviour
 
     public Transform patrolPoint;
 
-    public Transform maxX;
-    public Transform minX;   
-    public Transform maxY;
-    public Transform minY;
-    
-    private int randomSpot;
+    public GameObject[] limits;
 
+    private int randomSpot;
+    public Enemy enemyController;
     
     // Start is called before the first frame update
     void Start()
     {
         waitTime = startWaitTime;
-
-        patrolPoint.position = new Vector2(Random.Range(minX.position.x, maxX.position.x),Random.Range(minY.position.y, maxY.position.y));
+        patrolPoint = GameObject.FindWithTag("Waypoint").transform;
+        limits = GameObject.FindGameObjectsWithTag("Limit");
+        patrolPoint.position = new Vector2(Random.Range(GetLimit("minX").position.x, GetLimit("maxX").position.x),Random.Range( GetLimit("minY").position.y, GetLimit("maxY").position.y));
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(enemyController.isChasing) return;
         transform.position =
             Vector2.MoveTowards(transform.position, patrolPoint.position, speed * Time.deltaTime);
 
@@ -36,8 +35,8 @@ public class Patrol : MonoBehaviour
         {
             if (waitTime <= 0)
             {
-                patrolPoint.position = new Vector2(Random.Range(minX.position.x, maxX.position.x),
-                    Random.Range(minY.position.y, maxY.position.y));
+                patrolPoint.position = new Vector2(Random.Range(GetLimit("minX").position.x, GetLimit("maxX").position.x),
+                    Random.Range(GetLimit("minY").position.y, GetLimit("maxY").position.y));
                 waitTime = startWaitTime;
             }
             else
@@ -45,5 +44,17 @@ public class Patrol : MonoBehaviour
                 waitTime -= Time.deltaTime;
             }
         }
+    }
+
+    Transform GetLimit(string nameLimit)
+    {
+        foreach (var limit in limits)
+        {
+            if (limit.name.ToLower() == nameLimit.ToLower())
+            {
+                return limit.transform;
+            }
+        }
+        return null;
     }
 }

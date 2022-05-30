@@ -9,7 +9,7 @@ namespace Stats
 {
     public class Health : MonoBehaviour,ISaveable
     {
-        [SerializeField] private float healthPoints = 100f;
+        [SerializeField] private float healthPoints;
 
         [SerializeField] private float regenerantionPercentage = 70f;
         //[SerializeField] private GameObject instigator;
@@ -44,6 +44,21 @@ namespace Stats
             }
         }
 
+        public void PlayerTakeDamage()
+        {
+            healthPoints--;
+            if (healthPoints <= 0)
+            {
+                Die();
+            }
+        }
+        
+        public void PlayerHeal()
+        {
+            if(GetHealth() == GetMaxHealth()) return;
+            healthPoints++;
+        }
+        
         public void AwardExperience(GameObject instigator)
         {
             Experience experience = instigator.GetComponent<Experience>();

@@ -7,8 +7,10 @@ namespace Stats
     public enum CharacterClasses
     {
         Player,
-        Warrior,
-        Mage,
-        Archer
+        Spirit,
+        Desfibrillator,
+        Phantom,
+        Flame,
+        Beald,
     }
 }
